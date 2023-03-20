@@ -1,3 +1,5 @@
+var deviceId;
+
 navigator.mediaDevices.enumerateDevices().then((devices) => {
 
     // Iterate over all the list of devices (InputDeviceInfo and MediaDeviceInfo)
@@ -6,22 +8,21 @@ navigator.mediaDevices.enumerateDevices().then((devices) => {
         switch(device.kind){
             // Append device to list of Cameras
             case "videoinput":
-                console.log(device.label);
-                console.log(device.deviceId);
-                        var log = document.getElementById("log");
-        log.append(device.label);
-        log.append(device.deviceId);
+                deviceId = device.deviceId;
                 break;
         }
-        var log = document.getElementById("log");
-        log.append(device.label);
-        log.append(device.deviceId);
     });
 }).catch(function (e) {
     console.log(e.name + ": " + e.message);
 });
 
-navigator.mediaDevices.getUserMedia({video:true}).then(function(stream){
+const constraints = {
+            video: {
+                deviceId: deviceId ? {exact: deviceId} : undefined
+            }
+        };
+
+navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
 
   vid.onloadedmetadata = function(){
     this.width = overlay.width = this.videoWidth;
