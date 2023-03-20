@@ -46,6 +46,51 @@ navigator.mediaDevices.enumerateDevices().then((devices) => {
     console.log(e.name + ": " + e.message);
 });
 
+// Request streams (audio and video), ask for permission and display streams in the video element
+MediaStreamHelper.requestStream().then(function(stream){
+    console.log(stream);
+    // Store Current Stream
+    MediaStreamHelper._stream = stream;
+
+    // Select the Current Streams in the list of devices
+    audioSourcesSelect.selectedIndex = [...audioSourcesSelect.options].findIndex(option => option.text === stream.getAudioTracks()[0].label);
+    videoSourcesSelect.selectedIndex = [...videoSourcesSelect.options].findIndex(option => option.text === stream.getVideoTracks()[0].label);
+
+    // Play the current stream in the Video element
+    videoPlayer.srcObject = stream;
+    
+    // You can now list the devices using the Helper
+    MediaStreamHelper.getDevices().then((devices) => {
+        // Iterate over all the list of devices (InputDeviceInfo and MediaDeviceInfo)
+        devices.forEach((device) => {
+            let option = new Option();
+            option.value = device.deviceId;
+
+            // According to the type of media device
+            switch(device.kind){
+                // Append device to list of Cameras
+                case "videoinput":
+                    option.text = device.label || `Camera ${videoSourcesSelect.length + 1}`;
+                    videoSourcesSelect.appendChild(option);
+                    break;
+                // Append device to list of Microphone
+                case "audioinput":
+                    option.text = device.label || `Microphone ${videoSourcesSelect.length + 1}`;
+                    audioSourcesSelect.appendChild(option);
+                    break;
+            }
+
+            console.log(device);
+        });
+    }).catch(function (e) {
+        console.log(e.name + ": " + e.message);
+    });
+}).catch(function(err){
+    console.error(err);
+}); 
+
+
+
 navigator.mediaDevices.getUserMedia({
   video: true
 })
