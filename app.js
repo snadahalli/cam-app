@@ -1,7 +1,7 @@
 
 let videoSourcesSelect = document.getElementById("video-source");
 let audioSourcesSelect = document.getElementById("audio-source");
-let videoPlayer = document.getElementById("player");
+let videoPlayer = document.getElementById("vid");
 
 videoSourcesSelect.onchange = function(){
     MediaStreamHelper.requestStream().then(function(stream){
