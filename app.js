@@ -1,8 +1,55 @@
+
+let videoSourcesSelect = document.getElementById("video-source");
+let audioSourcesSelect = document.getElementById("audio-source");
+let videoPlayer = document.getElementById("player");
+
+videoSourcesSelect.onchange = function(){
+    MediaStreamHelper.requestStream().then(function(stream){
+        MediaStreamHelper._stream = stream;
+        videoPlayer.srcObject = stream;
+    });
+};
+
+audioSourcesSelect.onchange = function(){
+    MediaStreamHelper.requestStream().then(function(stream){
+        MediaStreamHelper._stream = stream;
+        videoPlayer.srcObject = stream;
+    });
+};
+
+navigator.mediaDevices.enumerateDevices().then((devices) => {
+    let videoSourcesSelect = document.getElementById("video-source");
+    let audioSourcesSelect = document.getElementById("audio-source");
+
+    // Iterate over all the list of devices (InputDeviceInfo and MediaDeviceInfo)
+    devices.forEach((device) => {
+        let option = new Option();
+        option.value = device.deviceId;
+
+        // According to the type of media device
+        switch(device.kind){
+            // Append device to list of Cameras
+            case "videoinput":
+                option.text = device.label || `Camera ${videoSourcesSelect.length + 1}`;
+                videoSourcesSelect.appendChild(option);
+                break;
+            // Append device to list of Microphone
+            case "audioinput":
+                option.text = device.label || `Microphone ${videoSourcesSelect.length + 1}`;
+                audioSourcesSelect.appendChild(option);
+                break;
+        }
+
+        console.log(device);
+    });
+}).catch(function (e) {
+    console.log(e.name + ": " + e.message);
+});
+
 navigator.mediaDevices.getUserMedia({
   video: true
 })
 .then(function(stream) {
-
   vid.onloadedmetadata = function() {
     this.width = overlay.width = this.videoWidth;
     this.height = overlay.height = this.videoHeight;
@@ -34,34 +81,3 @@ function doWhatYouWantWithTheCapturedImage(blob) {
   vid.parentNode.removeChild(vid);
   overlay.parentNode.removeChild(overlay);
 }
-
-// Set constraints for the video stream
-var constraints = { video: { facingMode: "environment" }, audio: false };
-// Define constants
-const cameraView = document.querySelector("#camera--view"),
-    cameraOutput = document.querySelector("#camera--output"),
-    cameraSensor = document.querySelector("#camera--sensor"),
-    cameraTrigger = document.querySelector("#camera--trigger");
-// Access the device camera and stream to cameraView
-function cameraStart() {
-    navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then(function(stream) {
-        track = stream.getTracks()[0];
-        cameraView.srcObject = stream;
-    })
-    .catch(function(error) {
-        console.error("Oops. Something is broken.", error);
-    });
-}
-// Take a picture when cameraTrigger is tapped
-cameraTrigger.onclick = function() {
-    cameraSensor.width = cameraView.videoWidth;
-    cameraSensor.height = cameraView.videoHeight;
-    cameraSensor.getContext("2d").drawImage(cameraView, 0, 0);
-    cameraOutput.src = cameraSensor.toDataURL("image/webp");
-    cameraOutput.classList.add("taken");
-};
-// Start the video stream when the window loads
-window.addEventListener("load", cameraStart, false);
-
