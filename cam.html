@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Camera Test</title>
+  </head>
+  <body>
+    <video id="camera-stream"></video>
+    <button id="take-picture">Take Picture</button>
+    <canvas id="picture"></canvas>
+    <script>
+      var video = document.getElementById('camera-stream');
+      var canvas = document.getElementById('picture');
+      var button = document.getElementById('take-picture');
+      var width = 320; // Video width
+      var height = 0; // Video height
+      var isFrontCamera = true; // By default, use front camera
+
+      // Get the user media
+      if (navigator.mediaDevices.getUserMedia) {
+        var constraints = { video: { facingMode: (isFrontCamera ? "user" : "environment") } };
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(function (stream) {
+            // Set the video source and dimensions
+            video.srcObject = stream;
+            video.play();
+            height = video.videoHeight / (video.videoWidth / width);
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+          })
+          .catch(function (error) {
+            console.error('Error accessing media devices.', error);
+          });
+      }
+
+      // Take the picture
+      button.addEventListener('click', function () {
+        canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+      });
+
+      // Switch between front and back cameras
+      video.addEventListener('click', function() {
+        isFrontCamera = !isFrontCamera;
+        var constraints = { video: { facingMode: (isFrontCamera ? "user" : "environment") } };
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(function (stream) {
+            video.srcObject = stream;
+          })
+          .catch(function (error) {
+            console.error('Error switching cameras.', error);
+          });
+      });
+    </script>
+  </body>
+</html>
