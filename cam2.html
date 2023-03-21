@@ -6,21 +6,22 @@
     <style>
 #guideline {
   width: 70%;
-  height: 60%;
+  height: 30%;
   border: 2px dashed #fff;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;}
+
 #camera-stream {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 0;
-  width: 68%;
-  height: 58%;
+  width: 69%;
+  height: 29%;
   object-fit: cover;
 }
 
@@ -31,12 +32,13 @@
   transform: translate(-50%, -50%);
   z-index: 2;
   width: 68%;
-  height: 58%;
+  height: 28%;
 }
+
 #take-picture {
-  display: block;
-  margin-top: 300px;
-  margin-left: 100px;
+  position:absolute;
+  margin-top:90%;
+  left: 50%;
 }
 
 </style>
@@ -53,7 +55,7 @@
       var button = document.getElementById('take-picture');
       var width = 320; // Video width
       var height = 0; // Video height
-      var isFrontCamera = true; // By default, use front camera
+      var isFrontCamera = back; // By default, use back camera
 
       // Get the user media
       if (navigator.mediaDevices.getUserMedia) {
