@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Camera Test</title>
+    <style>
+#guideline {
+  width: 70%;
+  height: 30%;
+  border: 2px dashed #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;}
+
+#camera-stream {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  width: 68%;
+  height: 28%;
+  object-fit: cover;
+}
+
+#picture {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 68%;
+  height: 28%;
+}
+
+#take-picture {
+  position:absolute;
+  margin-top:90%;
+  left: 50%;
+}
+
+</style>
+  </head>
+  <body>
+    <video id="camera-stream"></video>
+    <div id="guideline"></div>
+    <button id="take-picture">Take Picture</button>
+    <canvas id="picture"></canvas>
+    <p>Image output</p>
+    <img id="img" src="">
+    <script>
+      var img = document.getElementById('img');
+      var video = document.getElementById('camera-stream');
+      var canvas = document.getElementById('picture');
+      var button = document.getElementById('take-picture');
+      var width = 320; // Video width
+      var height = 0; // Video height
+      var isFrontCamera = false; // By default, use back camera
+
+      // Get the user media
+      if (navigator.mediaDevices.getUserMedia) {
+        var constraints = { video: { facingMode: (isFrontCamera ? "user" : "environment") } };
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(function (stream) {
+            // Set the video source and dimensions
+            video.srcObject = stream;
+            video.play();
+            height = video.videoHeight / (video.videoWidth / width);
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+          })
+          .catch(function (error) {
+            console.error('Error accessing media devices.', error);
+          });
+      }
+
+      // Take the picture
+      button.addEventListener('click', function () {
+        console.log("Clicked");
+        canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+        canvas.toBlob(doWhatYouWantWithTheCapturedImage);
+      });
+
+
+      function doWhatYouWantWithTheCapturedImage(blob){
+      var url = URL.createObjectURL(blob);
+      img.src = url;
+   }
+
+      // Switch between front and back cameras
+      video.addEventListener('click', function() {
+        isFrontCamera = !isFrontCamera;
+        var constraints = { video: { facingMode: (isFrontCamera ? "user" : "environment") } };
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(function (stream) {
+            video.srcObject = stream;
+          })
+          .catch(function (error) {
+            console.error('Error switching cameras.', error);
+          });
+      });
+
+
+document.getElementById("take-picture").addEventListener("click", function() {
+  // Get a reference to the canvas element and set its dimensions
+  var canvas = document.getElementById("picture");
+  canvas.width = guideline.offsetWidth;
+  canvas.height = guideline.offsetHeight;
+  
+  // Calculate the coordinates of the guideline overlay within the video stream
+  var rect = guideline.getBoundingClientRect();
+  var x = rect.left - video.getBoundingClientRect().left;
+  var y = rect.top - video.getBoundingClientRect().top;
+  
+  // Draw the current frame from the video stream onto the canvas, but only the portion that is inside the guideline overlay
+  var context = canvas.getContext("2d");
+  context.drawImage(video, x, y, rect.width, rect.height, 0, 0, canvas.width, canvas.height);
+  
+  // Convert the canvas data to a data URL
+  var dataURL = canvas.toDataURL("image/png");
+  
+  // Create a new link element and set its href attribute to the data URL
+  var link = document.createElement("a");
+  link.href = dataURL;
+  
+  // Set the download attribute to the filename you want to save the picture as
+  link.download = "my-picture.png";
+  
+  // Click the link to trigger the download
+  link.click();
+});
+
+
+    </script>
+  </body>
+</html>
