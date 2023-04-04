@@ -16,7 +16,7 @@
 
 #camera-stream {
   position: absolute;
-  top: 50%;
+  top: 20%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 0;
@@ -26,6 +26,7 @@
 }
 
 #picture {
+  display: none;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -48,7 +49,10 @@
     <div id="guideline"></div>
     <button id="take-picture">Take Picture</button>
     <canvas id="picture"></canvas>
+    <p>Image output</p>
+    <img id="img" src="">
     <script>
+      var img = document.getElementById('img');
       var video = document.getElementById('camera-stream');
       var canvas = document.getElementById('picture');
       var button = document.getElementById('take-picture');
@@ -74,6 +78,19 @@
             console.error('Error accessing media devices.', error);
           });
       }
+
+      // Take the picture
+      button.addEventListener('click', function () {
+        console.log("Clicked");
+        canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+        canvas.toBlob(doWhatYouWantWithTheCapturedImage);
+      });
+
+
+      function doWhatYouWantWithTheCapturedImage(blob){
+      var url = URL.createObjectURL(blob);
+      img.src = url;
+   }
 
       // Switch between front and back cameras
       video.addEventListener('click', function() {
