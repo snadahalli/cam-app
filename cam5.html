@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera</title>
+    <script src="https://cdn.jsdelivr.net/npm/modernizr@3.11.2/dist/modernizr.min.js"></script>
+</head>
+<body>
+    <div>
+        <video id="video" width="640" height="480" autoplay></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+        <div id="overlay" style="position: absolute; top: 50px; left: 50px; width: 200px; height: 200px; border: 2px dashed red;"></div>
+        <button id="snap">Take Picture</button>
+    </div>
+    <script>
+        navigator.getUserMedia = (navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia ||
+            navigator.msGetUserMedia ||
+            false);
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({video: true},
+                function (stream) {
+                    var video = document.querySelector('#video');
+                    video.srcObject = stream;
+                    video.onloadedmetadata = function (e) {
+                        video.play();
+                    };
+                },
+                function (err) {
+                    console.log("The following error occurred: " + err.name);
+                }
+            );
+        } else {
+            console.log("getUserMedia not supported");
+        }
+
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var video = document.getElementById('video');
+
+        document.getElementById("snap").addEventListener("click", function() {
+            context.drawImage(video, 0, 0, 640, 480);
+            var image = canvas.toDataURL("image/png");
+            var a = document.createElement("a");
+            a.href = image;
+            a.download = "image.png";
+            a.click();
+        });
+    </script>
+</body>
+</html>
