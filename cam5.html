@@ -2,8 +2,46 @@
 <html>
 <head>
     <title>Camera</title>
+#guideline {
+  width: 70%;
+  height: 30%;
+  border: 2px dashed #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;}
+
+#video {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  width: 68%;
+  height: 28%;
+  object-fit: cover;
+}
+
+#picture {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 68%;
+  height: 28%;
+}
+
+#take-picture {
+  position:absolute;
+  margin-top:90%;
+  left: 50%;
+}
     <script src="https://cdn.jsdelivr.net/npm/modernizr@3.11.2/dist/modernizr.min.js"></script>
 </head>
+
 <body>
     <div>
         <video id="video" width="640" height="480" autoplay></video>
@@ -12,6 +50,8 @@
         <button id="snap">Take Picture</button>
     </div>
     <script>
+         var isFrontCamera = false; // By default, use back camera
+         var constraints = { video: { facingMode: (isFrontCamera ? "user" : "environment") } };
         navigator.getUserMedia = (navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
             navigator.mozGetUserMedia ||
@@ -19,7 +59,7 @@
             false);
 
         if (navigator.getUserMedia) {
-            navigator.getUserMedia({video: true},
+            navigator.getUserMedia(constraints,
                 function (stream) {
                     var video = document.querySelector('#video');
                     video.srcObject = stream;
