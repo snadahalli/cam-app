@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Take a Picture</title>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+      #video {
+        max-width: 100%;
+        height: auto;
+      }
+      #video2 {
+        position: absolute;
+        top: 50%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        height: 40%;
+        border: 2px dashed #fff;
+        box-sizing: border-box;
+      }
+      #canvas {
+        position: absolute;
+        top: 50%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 200px;
+        border: 2px dashed #fff;
+        box-sizing: border-box;
+      }
+      #overlay {
+        position: absolute;
+        top: 50%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 200px;
+        border: 2px dashed #fff;
+        box-sizing: border-box;
+      }
+      #capture {
+        display: block;
+        margin: 0 auto;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        background-color: #1e90ff;
+        color: #fff;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="overlay"></div>
+    <video id="video"></video>
+    <button id="capture">Take Picture</button>
+   <canvas id="canvas"></canvas>
+    <script>
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const captureButton = document.getElementById('capture');
+      const overlay = document.getElementById('overlay');
+
+      // set default camera to back camera on mobile devices
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const facingMode = isMobile ? { facingMode: { exact: 'environment' } } : { facingMode: 'user' };
+
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          ...facingMode,
+          //facingMode: 'user'
+        }
+      })
+      .then(stream => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+
+          // draw the overlay
+          const ratio = video.videoWidth / video.videoHeight;
+          const overlayWidth = overlay.offsetHeight * ratio;
+          //overlay.style.width = `${overlayWidth}px`;
+
+          // set canvas dimensions to match video
+          //canvas.width = video.videoWidth;
+          //canvas.height = video.videoHeight;
+          //canvas.style.width = overlay.offsetWidth;
+          //canvas.style.height = overlay.offsetHeight;
+        };
+      })
+      .catch(err => console.error('Error accessing camera:', err));
+
+// ONe more new code!!
+      // Get the overlay element
+// Capture the image
+captureButton.addEventListener("click", function() {
+  // Get the position of the overlay using getBoundingClientRect()
+  var rect = overlay.getBoundingClientRect();
+  var overlayLeft = rect.left;
+  var overlayTop = rect.top;
+  
+  // Create a canvas element to draw the captured image
+  var canvas = document.createElement("canvas");
+  var ctx = canvas.getContext("2d");
+  
+  // Set the canvas size to match the overlay
+  canvas.width = overlay.offsetWidth;
+  canvas.height = overlay.offsetHeight;
+  
+  // Draw the content within the overlay onto the canvas
+  ctx.drawImage(video, -overlayLeft, -overlayTop);
+  
+  // Convert the canvas to a data URL and trigger a download
+  var dataURL = canvas.toDataURL("image/png");
+  var link = document.createElement("a");
+  link.href = dataURL;
+  link.download = "screenshot.png";
+  link.click();
+});
+
+
+// Add a click event listener to the capture button
+captureButton33.addEventListener('click', function() {
+    // Capture the image within the overlay using html2canvas
+    html2canvas(document.getElementById('video'), {
+      x: overlay.offsetLeft,
+      y: overlay.offsetTop,
+        width: overlay.offsetWidth,
+        height: overlay.offsetHeight
+    }).then(function(canvas) {
+        // Convert the captured canvas to an image data URL
+        var dataURL = canvas.toDataURL();
+
+        // Create a link element to download the image
+        var link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'overlay.png';
+        document.body.appendChild(link);
+
+        // Trigger a click event on the link element to initiate the download
+        link.click();
+
+        // Remove the link element from the DOM
+        document.body.removeChild(link);
+    });
+});
+
+      captureButton22.addEventListener("click", () => {
+       // const canvas2 = document.createElement("canvas");
+       // canvas2.width = overlay.offsetWidth;
+       // canvas2.height = overlay.offsetHeight;
+      //  const ctx = canvas2.getContext("2d");
+       // const canvas2 = document.createElement("canvas");
+      //  canvas.width = overlay.offsetWidth;
+      //  canvas.height = overlay.offsetHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(
+          video,
+          overlay.offsetLeft,
+          overlay.offsetTop,
+          overlay.offsetWidth,
+          overlay.offsetHeight,
+          0,
+          0,
+          overlay.offsetWidth,
+          overlay.offsetHeight
+        );
+        const dataUrl = canvas.toDataURL("image/jpeg");
+        downloadPhoto(dataUrl);
+      });
+
+     function downloadPhoto(dataUrl) {
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = "photo.jpeg";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      captureButton11.addEventListener('click', () => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  //const overlay = document.querySelector(".overlay");
+
+  const croppedCanvas = document.createElement("canvas");
+  const croppedCtx = croppedCanvas.getContext("2d");
+  croppedCanvas.width = overlay.offsetWidth;
+  croppedCanvas.height = overlay.offsetHeight;
+
+  const img = new Image();
+  img.src = canvas.toDataURL();
+  img.onload = function() {
+    const x = overlay.offsetLeft;
+    const y = overlay.offsetTop;
+    const width = overlay.offsetWidth;
+    const height = overlay.offsetHeight;
+    croppedCtx.drawImage(img, x, y, width, height, 0, 0, width, height);
+
+    const link = document.createElement("a");
+    link.download = "my-image.png";
+    link.href = croppedCanvas.toDataURL();
+    link.click();
+  };
+});
+      function cropImageToOverlay(canvas, overlay) {
+  // calculate the scale factor between the canvas and the video
+  const scaleFactorX = canvas.width / overlay.offsetWidth;
+  const scaleFactorY = canvas.height / overlay.offsetHeight;
+
+  // calculate the dimensions of the cropped image
+  const cropWidth = overlay.offsetWidth * scaleFactorX;
+  const cropHeight = overlay.offsetHeight * scaleFactorY;
+  const cropX = (canvas.width - cropWidth) / 2;
+  const cropY = (canvas.height - cropHeight) / 2;
+
+  // create a new canvas to hold the cropped image
+  const croppedCanvas = document.createElement("canvas");
+  croppedCanvas.width = cropWidth;
+  croppedCanvas.height = cropHeight;
+
+  // copy the cropped region of the original canvas to the new canvas
+  const ctx = croppedCanvas.getContext("2d");
+  ctx.drawImage(
+    canvas,
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    cropWidth,
+    cropHeight
+  );
+
+  // convert the canvas to a data URL and return it
+  return croppedCanvas.toDataURL("image/png");
+}
+
+    </script>
+  </body>
+</html>
